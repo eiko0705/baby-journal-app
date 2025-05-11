@@ -28,7 +28,7 @@ export const calculateAgeAtEvent = (birthDateString: string, eventDateString: st
         const months = differenceInMonths(eventDate, birthDate)
         const dateAfterMonths = subMonths(dateAfterYears, months)
 
-        const days = differenceInDays(eventDate, birthDate)
+        const days = differenceInDays(dateAfterMonths, birthDate)
 
         return { years, months, days }
         

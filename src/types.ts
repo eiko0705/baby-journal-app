@@ -14,6 +14,6 @@ export interface Achievement {
     photo?: string
 }
 
-export type NewAchievementPayload = Omit<Achievement, 'id' | 'ageAtEvent'>
+export type NewAchievementPayload = Omit<Achievement, 'id'>
 
 

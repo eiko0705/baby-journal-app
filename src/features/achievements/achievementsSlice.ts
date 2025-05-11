@@ -19,29 +19,31 @@ export const achievementsSlice = createSlice({
             const newAchievement: Achievement = {
                 id: nanoid(),
                 ...action.payload,
-                ageAtEvent: null
             }
             state.items.push(newAchievement)
+            state.items.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
         },
         removeAchievement: (state, action: PayloadAction<string>) => {
             state.items = state.items.filter(achievement => achievement.id !== action.payload)
         },
         updateAchievement: (state, action: PayloadAction<Achievement>) => {
-            const achievement = state.items.find(item => item.id === action.payload.id)
-            if (achievement) {
-                achievement.ageAtEvent = action.payload.ageAtEvent
+            const index = state.items.findIndex(item => item.id === action.payload.id)
+            if (index !== -1) {
+                state.items[index] = action.payload
             }
         },
+        /*
         setAchievementAge: (state, action: PayloadAction<Achievement>) => {
             const achievements = state.items.find(item => item.id === action.payload.id)
             if (achievements) {
                 achievements.ageAtEvent = action.payload.ageAtEvent
             }
         }
+        */
     }
 })
 
-export const { addAchievement, removeAchievement, updateAchievement, setAchievementAge } = achievementsSlice.actions
+export const { addAchievement, removeAchievement, updateAchievement } = achievementsSlice.actions
 export const selectAllAchievements = (state: RootState) => state.achievements.items
 export const selectAchievementById = (state: RootState, id: string) => state.achievements.items.find(item => item.id === id)
 
