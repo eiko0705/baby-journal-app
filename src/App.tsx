@@ -2,6 +2,8 @@ import React from 'react'
 import { Container, Typography, Box } from '@mui/material'
 import './App.css'
 import ChildBirthdayInput from './features/childProfile/ChildBirthdayInput'
+import AddAchievementForm from './features/achievements/components/AddAchievementForm'
+import AchievementsList from './features/achievements/components/AchievementsList'
 
 function App() {
 
@@ -12,6 +14,8 @@ function App() {
           Mameko　App
         </Typography>
         <ChildBirthdayInput />
+        <AddAchievementForm />
+        <AchievementsList />
       </Box>
     </Container>
   )
