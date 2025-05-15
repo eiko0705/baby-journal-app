@@ -31,7 +31,7 @@ const AddAchievementForm: React.FC = () => {
 
         const calculatedAge: Age | null = calculateAgeAtEvent(childBirthday, date)
         if (!calculatedAge) {
-            alert('日付の形式が正しくないか、イベント日が誕生日より前です。')
+            alert('日付の形式が正しくないか、イベント日が誕生日より前です。修正してください。')
             return
         }
 
