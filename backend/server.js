@@ -51,6 +51,15 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+app.get('/api/achievements', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM achievements ORDER BY date DESC, created_at DESC');
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching achievements:', error);
+    res.status(500).json({ error: 'Internal server error while fetching achievements' });
+  }
+
 app.post('/api/achievements', async (req, res) => {
   const { date, title, description, ageAtEvent, tags, photoUrl } = req.body;
 
