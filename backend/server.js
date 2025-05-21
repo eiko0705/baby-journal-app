@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const { Pool } = require('pg');
+const { nanoid } = require('nanoid');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -47,6 +48,46 @@ app.get('/api/health', async (req, res) => {
       postgres: 'Connection Error',
       error: error.message,
     });
+  }
+});
+
+app.post('/api/achievements', async (req, res) => {
+  const { date, title, description, ageAtEvent, tags, photoUrl } = req.body;
+
+  if (!date || !title) {
+    return res.status(400).json({ error: 'Date and title are required' });
+  }
+
+  if (ageAtEvent === undefined || ageAtEvent === null) {
+    return res.status(400).json({ error: 'Age at event is required' });
+  }
+
+  const newId = nanoid();
+
+  try {
+    const queryText = `
+      INSERT INTO achievements (id, date, title, description, age_years, age_months, age_days, tags, photo_url)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING *
+    `;
+
+    const values = [
+      newId,
+      date,
+      title, 
+      description,
+      ageAtEvent.years,
+      ageAtEvent.months,
+      ageAtEvent.days,
+      tags,
+      photoUrl,
+    ];
+
+    const result = await pool.query(queryText, values);
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error creating achievement:', error);
+    res.status(500).json({ error: 'Internal server error while creating achievement' });
   }
 });
 
