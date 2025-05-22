@@ -1,8 +1,7 @@
-require('dotenv').config();
-
-const express = require('express');
-const { Pool } = require('pg');
-const { nanoid } = require('nanoid');
+import 'dotenv/config';
+import express from 'express';
+import { Pool } from 'pg';
+import { nanoid } from 'nanoid';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -59,6 +58,7 @@ app.get('/api/achievements', async (req, res) => {
     console.error('Error fetching achievements:', error);
     res.status(500).json({ error: 'Internal server error while fetching achievements' });
   }
+});
 
 app.post('/api/achievements', async (req, res) => {
   const { date, title, description, ageAtEvent, tags, photoUrl } = req.body;
