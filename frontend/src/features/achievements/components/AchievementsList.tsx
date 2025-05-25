@@ -1,8 +1,9 @@
-    import React from 'react'
-    import { useSelector } from 'react-redux'
-    import { Box, Typography, List, ListItem, ListItemText, Chip, Divider, Paper } from '@mui/material'
-    import { selectAllAchievements } from '../achievementsSlice'
+    import React, { useEffect } from 'react'
+    import { useSelector, useDispatch } from 'react-redux'
+    import { Box, Typography, List, ListItem, ListItemText, Chip, Divider, Paper, CircularProgress } from '@mui/material'
+    import { fetchAchievements, selectAllAchievements, selectAchievementsStatus, selectAchievementsError } from '../achievementsSlice'
     import type { Achievement, Age } from '../../../types'
+    import type { AppDispatch } from '../../../app/store'
 
     const formatAge = (age: Age | null): string => {
         if (!age) return '月齢未計算'
@@ -11,8 +12,33 @@
 
     const AchievementsList: React.FC = () => {
         const achievements = useSelector(selectAllAchievements)
+        const dispatch: AppDispatch = useDispatch()
+        const status = useSelector(selectAchievementsStatus)
+        const error = useSelector(selectAchievementsError)
 
-        if (achievements.length === 0) {
+        useEffect(() => {
+            if (status === 'idle') {
+                dispatch(fetchAchievements())
+            }
+        }, [status, dispatch])
+
+        if (status === 'loading') {
+            return (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                    <CircularProgress />
+                </Box>
+            )
+        }
+
+        if (status === 'failed') {
+            return (
+                <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>
+                    エラー: {error}
+                </Typography>
+            )
+        }
+
+        if (achievements.length === 0 && status === 'succeeded') {
             return (
                 <Typography color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
                     まだ「できたこと」記録がありません。
