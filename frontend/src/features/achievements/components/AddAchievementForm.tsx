@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { TextField, Button, Box, Typography, Grid } from '@mui/material'
+import { TextField, Button, Box, Typography, Grid, CircularProgress } from '@mui/material'
 import type { AppDispatch } from '../../../app/store'
-import { addAchievement } from '../achievementsSlice'
+import { addNewAchievement, selectAchievementsStatus } from '../achievementsSlice'
 import { selectBirthday } from '../../childProfile/childProfileSlice'
 import { calculateAgeAtEvent } from '../../../utils/dateUtils'
 import type { NewAchievementPayload, Age } from '../../../types'
@@ -10,13 +10,14 @@ import type { NewAchievementPayload, Age } from '../../../types'
 const AddAchievementForm: React.FC = () => {
     const dispatch: AppDispatch = useDispatch()
     const childBirthday = useSelector(selectBirthday)
+    const addStatus = useSelector(selectAchievementsStatus)
     
     const [date, setDate] = useState<string>('')
     const [title, setTitle] = useState<string>('')
     const [description, setDescription] = useState<string>('')
     const [tags, setTags] = useState<string>('')
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
 
         if (!childBirthday) {
@@ -44,12 +45,16 @@ const AddAchievementForm: React.FC = () => {
             // photo: null
         }
 
-        dispatch(addAchievement(newAchievementPayload))
-
-        setDate('')
-        setTitle('')
-        setDescription('')
-        setTags([])
+        try {
+            await dispatch(addNewAchievement(newAchievementPayload)).unwrap()
+            setDate('')
+            setTitle('')
+            setDescription('')
+            setTags('')
+        } catch (error: any) {
+            console.error('Failed to add achievement:', error)
+            alert(`記録に失敗しました。: ${error.message || '不明なエラーが発生しました。'}`)
+        }
     }
 
     return (
@@ -59,26 +64,29 @@ const AddAchievementForm: React.FC = () => {
             sx={{ mt: 2, p: 2, border: '1px solid lightgray', borderRadius: '8px' }}>
             <Typography variant="h6" gutterBottom>Add Achievement</Typography>
             <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                     <TextField
                         label="日付"
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
+                        InputLabelProps={{ shrink: true }}
                         fullWidth
                         required
+                        disabled={addStatus === 'loading'}
                     />
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                     <TextField
                         label="タイトル"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         fullWidth
                         required
+                        disabled={addStatus === 'loading'}
                     />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid xs={12}>
                     <TextField
                         label="詳細"
                         value={description}
@@ -86,24 +94,27 @@ const AddAchievementForm: React.FC = () => {
                         multiline
                         rows={3}
                         fullWidth
+                        disabled={addStatus === 'loading'}
                     />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid xs={12}>
                     <TextField
                         label="タグ（カンマ区切りで入力）"
                         value={tags}
                         onChange={(e) => setTags(e.target.value)}
                         fullWidth
                         helperText="例：　#初めてのハイハイ, #お気に入りのおもちゃ"
+                        disabled={addStatus === 'loading'}
                     />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid xs={12}>
                     <Button
                         type="submit"
                         variant="contained"
                         color="primary"
+                        disabled={addStatus === 'loading'}
                     >
-                        記録する
+                        {addStatus === 'loading' ? <CircularProgress size={24} /> : '記録する'}
                     </Button>
                 </Grid>
             </Grid>
