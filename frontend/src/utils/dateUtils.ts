@@ -30,10 +30,6 @@ export const calculateAgeAtEvent = (birthDateString: string, eventDateString: st
 
         const days = differenceInDays(dateAfterMonths, birthDate)
 
-        console.log('years', years)
-        console.log('months', months)
-        console.log('days', days)
-
         return { years, months, days }
         
     } catch (error) {

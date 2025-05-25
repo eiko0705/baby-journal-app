@@ -53,7 +53,25 @@ app.get('/api/health', async (req, res) => {
 app.get('/api/achievements', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM achievements ORDER BY date DESC, created_at DESC');
-    res.status(200).json(result.rows);
+
+    const formattedAchievements = result.rows.map(achievement => {
+      return {
+        id: achievement.id,
+        date: achievement.date,
+        title: achievement.title,
+        description: achievement.description,
+        ageAtEvent: (achievement.age_years !== null && achievement.age_months !== null && achievement.age_days !== null) ? {
+          years: achievement.age_years,
+          months: achievement.age_months,
+          days: achievement.age_days,
+        } : null,
+        tags: achievement.tags || [],
+        photoUrl: achievement.photo_url,
+        createdAt: achievement.created_at,
+        updatedAt: achievement.updated_at,
+      }
+    });
+    res.status(200).json(formattedAchievements);
   } catch (error) {
     console.error('Error fetching achievements:', error);
     res.status(500).json({ error: 'Internal server error while fetching achievements' });
