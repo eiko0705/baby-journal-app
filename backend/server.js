@@ -118,6 +118,30 @@ app.post('/api/achievements', async (req, res) => {
   }
 });
 
+app.delete('/api/achievements/:id', async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ error: 'Achievement ID is required' });
+  }
+
+  try {
+    const queryText = 'DELETE FROM achievements WHERE id = $1 RETURNING id';
+    const values = [id];
+
+    const result = await pool.query(queryText, values);
+    
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Achievement not found' });
+    }
+
+    res.status(200).json({ message: 'Achievement deleted successfully', id: result.rows[0].id });
+  } catch (error) {
+    console.error(`Error deleting achievement with id ${id}:`, error);
+    res.status(500).json({ error: 'Internal server error while deleting achievement' });
+  }
+})
+
 app.listen(port, () => {
   console.log(`Backend server is listening on port ${port}`);
 });
