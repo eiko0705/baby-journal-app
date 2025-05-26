@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../../app/store'
 import type { Achievement, NewAchievementPayload } from '../../types'
-import { createAchievemntAPI, fetchAchievementsAPI } from '../../services/achievementService'
+import { createAchievemntAPI, fetchAchievementsAPI, deleteAchievementAPI } from '../../services/achievementService'
 
 interface AchievementsState {
     items: Achievement[]
@@ -32,13 +32,18 @@ export const addNewAchievement = createAsyncThunk<Achievement, NewAchievementPay
     }
 )
 
+export const deleteAchievement = createAsyncThunk<string, string>(
+    'achievements/deleteAchievement',
+    async (id: string) => {
+        const response = await deleteAchievementAPI(id)
+        return response.id
+    }
+)
+
 export const achievementsSlice = createSlice({
     name: 'achievements',
     initialState,
     reducers: {
-        removeAchievement: (state, action: PayloadAction<string>) => {
-            state.items = state.items.filter(achievement => achievement.id !== action.payload)
-        },
         updateAchievement: (state, action: PayloadAction<Achievement>) => {
             const index = state.items.findIndex(item => item.id === action.payload.id)
             if (index !== -1) {
@@ -70,10 +75,21 @@ export const achievementsSlice = createSlice({
                 state.status = 'failed'
                 state.error = action.error.message || 'Failed to add new achievements'
             })
+            .addCase(deleteAchievement.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(deleteAchievement.fulfilled, (state, action: PayloadAction<string>) => {
+                state.status = 'succeeded'
+                state.items = state.items.filter(item => item.id !== action.payload)
+            })
+            .addCase(deleteAchievement.rejected, (state, action) => {
+                state.status = 'failed'
+                state.error = action.error.message || 'Failed to delete achievement'
+            })
         }
 })
 
-export const { removeAchievement, updateAchievement } = achievementsSlice.actions
+export const { updateAchievement } = achievementsSlice.actions
 export const selectAllAchievements = (state: RootState) => state.achievements.items
 export const selectAchievementsStatus = (state: RootState) => state.achievements.status
 export const selectAchievementsError = (state: RootState) => state.achievements.error

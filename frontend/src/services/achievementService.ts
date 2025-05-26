@@ -12,3 +12,8 @@ export const createAchievemntAPI = async (achievementData: NewAchievementPayload
   const response = await axios.post<Achievement>(`${API_BASE_URL}/achievements`, achievementData);
   return response.data;
 }
+
+export const deleteAchievementAPI = async (id: string): Promise<{ id: string }> => {
+  const response = await axios.delete<{ message: string, id: string }>(`${API_BASE_URL}/achievements/${id}`)
+  return { id: response.data.id };
+}
