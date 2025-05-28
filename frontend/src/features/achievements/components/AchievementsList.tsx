@@ -1,7 +1,8 @@
-    import React, { useEffect } from 'react'
+    import React, { useEffect, useState } from 'react'
     import { useSelector, useDispatch } from 'react-redux'
-    import { Box, Typography, List, ListItem, ListItemText, Chip, Divider, Paper, CircularProgress } from '@mui/material'
-    import { fetchAchievements, selectAllAchievements, selectAchievementsStatus, selectAchievementsError } from '../achievementsSlice'
+    import { Box, Typography, List, ListItem, ListItemText, Chip, Divider, Paper, CircularProgress, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material'
+    import DeleteIcon from '@mui/icons-material/Delete'
+    import { fetchAchievements, deleteAchievement, selectAllAchievements, selectAchievementsStatus, selectAchievementsError } from '../achievementsSlice'
     import type { Achievement, Age } from '../../../types'
     import type { AppDispatch } from '../../../app/store'
 
@@ -16,13 +17,39 @@
         const status = useSelector(selectAchievementsStatus)
         const error = useSelector(selectAchievementsError)
 
+        const [openDialog, setOpenDialog] = useState(false)
+        const [selectedAchievementId, setSelectedAchievementId] = useState<string | null>(null)
+
         useEffect(() => {
             if (status === 'idle') {
                 dispatch(fetchAchievements())
             }
         }, [status, dispatch])
 
-        if (status === 'loading') {
+        const handleDeleteClick = (id: string) => {
+            setSelectedAchievementId(id)
+            setOpenDialog(true)
+        }
+
+        const handleCloseDialog = () => {
+            setOpenDialog(false)
+            setSelectedAchievementId(null)
+        }
+
+        const handleConfirmDelete = async () => {
+            if (selectedAchievementId) {
+                try {
+                    await dispatch(deleteAchievement(selectedAchievementId)).unwrap()
+                } catch (error) {
+                    console.error('Error deleting achievement:', error)
+                    alert(`削除に失敗しました。${error instanceof Error ? error.message : '不明なエラーが発生しました。'}`)
+                } finally {
+                    handleCloseDialog()
+                }
+            }
+        }
+
+        if (status === 'loading' && achievements.length === 0) {
             return (
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
                     <CircularProgress />
@@ -30,7 +57,7 @@
             )
         }
 
-        if (status === 'failed') {
+        if (status === 'failed' && achievements.length === 0) {
             return (
                 <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>
                     エラー: {error}
@@ -51,11 +78,24 @@
                 <Typography variant="h6" gutterBottom>
                     「できたこと」の記録一覧
                 </Typography>
+                {status === 'loading' && <CircularProgress size={20} sx={{ display: 'block', margin: '0 auto' }} />}
                 <Paper elevation={2}>
                     <List disablePadding>
                         {achievements.map((achievement: Achievement, index: number) => (
                             <React.Fragment key={achievement.id}>
-                                <ListItem alignItems="flex-start">
+                                <ListItem 
+                                    alignItems="flex-start"
+                                    secondaryAction={
+                                        <IconButton
+                                            edge="end"
+                                            aria-label="delete"
+                                            onClick={() => handleDeleteClick(achievement.id)}
+                                            disabled={status === 'loading'}
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    }
+                                >
                                     <ListItemText
                                         primary={
                                             <Typography variant="subtitle1" component="span" fontWeight="bold">
@@ -88,6 +128,26 @@
                         ))}
                     </List>
                 </Paper>
+
+                <Dialog
+                    open={openDialog}
+                    onClose={handleCloseDialog}
+                    aria-labelledby="delete-dialog-title"
+                    aria-describedby="delete-dialog-description"
+                >
+                    <DialogTitle id="delete-dialog-title">
+                        記録の削除
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="delete-dialog-description">
+                            この「できたこと」の記録を本当に削除しますか？この操作は元に戻せません。
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDialog} color="primary">キャンセル</Button>
+                        <Button onClick={handleConfirmDelete} color="error" autoFocus>削除する</Button>
+                    </DialogActions>
+                </Dialog>
             </Box>
         )
     }   
