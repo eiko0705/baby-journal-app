@@ -142,6 +142,60 @@ app.delete('/api/achievements/:id', async (req, res) => {
   }
 })
 
+app.put('/api/achievements/:id', async (req, res) => {
+  const { id } = req.params;
+  const { date, title, description, ageAtEvent, tags, photoUrl } = req.body;
+
+  if (!date || !title) {
+    return res.status(400).json({ error: 'Date and title are required' });
+  }
+  if (ageAtEvent === undefined || ageAtEvent === null || 
+    typeof ageAtEvent.years !== 'number' ||
+    typeof ageAtEvent.months !== 'number' ||
+    typeof ageAtEvent.days !== 'number') {
+    return res.status(400).json({ error: 'Valid ageAtEvent (with years, months, and days) is required' });
+  }
+
+  try {
+    const queryText = `
+      UPDATE achievements
+      SET date = $1,
+          title = $2,
+          description = $3,
+          age_years = $4,
+          age_months = $5,
+          age_days = $6,
+          tags = $7,
+          photo_url = $8,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = $9
+      RETURNING *;
+    `;
+    const values = [
+      date,
+      title,
+      description || null,
+      ageAtEvent.years,
+      ageAtEvent.months,
+      ageAtEvent.days,
+      tags || [],
+      photoUrl || null,
+      id,
+    ];
+
+    const result = await pool.query(queryText, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Achievement not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error(`Error updating achievement with id ${id}:`, error);
+    res.status(500).json({ error: 'Internal server error while updating achievement' });
+  }
+});
+  
 app.listen(port, () => {
   console.log(`Backend server is listening on port ${port}`);
 });
