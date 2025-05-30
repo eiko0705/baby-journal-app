@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../../app/store'
 import type { Achievement, NewAchievementPayload } from '../../types'
-import { createAchievemntAPI, fetchAchievementsAPI, deleteAchievementAPI } from '../../services/achievementService'
+import { createAchievemntAPI, fetchAchievementsAPI, deleteAchievementAPI, updateAchievementAPI } from '../../services/achievementService'
 
 interface AchievementsState {
     items: Achievement[]
@@ -40,17 +40,18 @@ export const deleteAchievement = createAsyncThunk<string, string>(
     }
 )
 
+export const updateAchievement = createAsyncThunk<Achievement, { id: string, achievementData: NewAchievementPayload}>(
+    'achievements/updateAchievement',
+    async ({ id, achievementData }) => {
+        const response = await updateAchievementAPI(id, achievementData)
+        return response
+    }
+)
+
 export const achievementsSlice = createSlice({
     name: 'achievements',
     initialState,
-    reducers: {
-        updateAchievement: (state, action: PayloadAction<Achievement>) => {
-            const index = state.items.findIndex(item => item.id === action.payload.id)
-            if (index !== -1) {
-                state.items[index] = action.payload
-            }
-        },
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
             .addCase(fetchAchievements.pending, (state) => {
@@ -86,10 +87,25 @@ export const achievementsSlice = createSlice({
                 state.status = 'failed'
                 state.error = action.error.message || 'Failed to delete achievement'
             })
+            .addCase(updateAchievement.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(updateAchievement.fulfilled, (state, action: PayloadAction<Achievement>) => {
+                state.status = 'succeeded'
+                const updatedAchievement = action.payload
+                const index = state.items.findIndex(item => item.id === updatedAchievement.id)
+                if (index !== -1) {
+                    state.items[index] = updatedAchievement
+                }
+                state.items.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+            })
+            .addCase(updateAchievement.rejected, (state, action) => {
+                state.status = 'failed'
+                state.error = action.error.message || 'Failed to update achievement'
+            })
         }
 })
 
-export const { updateAchievement } = achievementsSlice.actions
 export const selectAllAchievements = (state: RootState) => state.achievements.items
 export const selectAchievementsStatus = (state: RootState) => state.achievements.status
 export const selectAchievementsError = (state: RootState) => state.achievements.error
