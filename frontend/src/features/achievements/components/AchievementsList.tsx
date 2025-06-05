@@ -14,11 +14,7 @@
     import type { Achievement, Age, NewAchievementPayload } from '../../../types'
     import type { AppDispatch } from '../../../app/store'
     import EditAchievementModal from './EditAchievementModal'
-
-    const formatAge = (age: Age | null): string => {
-        if (!age) return '月齢未計算'
-        return `${age.years}歳${age.months}ヶ月${age.days}日`
-    }
+    import { formatAge } from '../../../utils/dateUtils'
 
     const AchievementsList: React.FC = () => {
         const achievements = useSelector(selectAllAchievements)
@@ -91,7 +87,7 @@
 
         if (status === 'failed' && achievements.length === 0) {
             return (
-                <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>
+                <Typography color='error' sx={{ mt: 2, textAlign: 'center' }}>
                     エラー: {error}
                 </Typography>
             )
@@ -99,7 +95,7 @@
 
         if (achievements.length === 0 && status === 'succeeded') {
             return (
-                <Typography color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
+                <Typography color='text.secondary' sx={{ mt: 2, textAlign: 'center' }}>
                     まだ「できたこと」記録がありません。
                 </Typography>
             )
@@ -107,7 +103,7 @@
         
         return (
             <Box sx={{ mt: 3 }}>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant='h6' gutterBottom>
                     「できたこと」の記録一覧
                 </Typography>
                 {status === 'loading' && <CircularProgress size={20} sx={{ display: 'block', margin: '0 auto' }} />}
@@ -116,12 +112,12 @@
                         {achievements.map((achievement: Achievement, index: number) => (
                             <React.Fragment key={achievement.id}>
                                 <ListItem 
-                                    alignItems="flex-start"
+                                    alignItems='flex-start'
                                     secondaryAction={
                                         <>
                                             <IconButton
-                                                edge="end"
-                                                aria-label="edit"
+                                                edge='end'
+                                                aria-label='edit'
                                                 onClick={() => handleEditClick(achievement)}
                                                 sx={{ mr: 0.5 }}
                                                 disabled={status === 'loading'}
@@ -129,8 +125,8 @@
                                                 <EditIcon />
                                             </IconButton>
                                             <IconButton
-                                                edge="end"
-                                                aria-label="delete"
+                                                edge='end'
+                                                aria-label='delete'
                                                 onClick={() => handleDeleteClick(achievement.id)}
                                                 disabled={status === 'loading'}
                                             >
@@ -141,22 +137,22 @@
                                 >
                                     <ListItemText
                                         primary={
-                                            <Typography variant="subtitle1" component="span" fontWeight="bold">
+                                            <Typography variant='subtitle1' component='span' fontWeight='bold'>
                                                 {achievement.title}
                                             </Typography>
                                         }
                                         secondary={
                                             <>
-                                                <Typography component="span" variant="body2" color="text.primary" display="block">
+                                                <Typography component='span' variant='body2' color='text.primary' display='block'>
                                                     日付: {achievement.date}（月齢: {formatAge(achievement.ageAtEvent)}）
                                                 </Typography> 
-                                                <Typography component="span" variant="body2" color="text.secondary" display="block" sx={{ whiteSpace: 'pre-wrap', mt: 0.5 }}>
+                                                <Typography component='span' variant='body2' color='text.secondary' display='block' sx={{ whiteSpace: 'pre-wrap', mt: 0.5 }}>
                                                     {achievement.description}
                                                 </Typography>
                                                 {achievement.tags && achievement.tags.length > 0 && (
                                                     <Box sx={{ mt: 1 }}>
                                                         {achievement.tags.map((tag: string) => (
-                                                            <Chip key={tag} label={tag} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
+                                                            <Chip key={tag} label={tag} size='small' sx={{ mr: 0.5, mb: 0.5 }} />
                                                         ))}
                                                     </Box>
                                                 )}
@@ -165,7 +161,7 @@
                                     />
                                 </ListItem>
                                 {index < achievements.length - 1 && (
-                                    <Divider component="li" />
+                                    <Divider component='li' />
                                 )}
                             </React.Fragment>
                         ))}
@@ -175,20 +171,20 @@
                 <Dialog
                     open={openDialog}
                     onClose={handleCloseDialog}
-                    aria-labelledby="delete-dialog-title"
-                    aria-describedby="delete-dialog-description"
+                    aria-labelledby='delete-dialog-title'
+                    aria-describedby='delete-dialog-description'
                 >
-                    <DialogTitle id="delete-dialog-title">
+                    <DialogTitle id='delete-dialog-title'>
                         記録の削除
                     </DialogTitle>
                     <DialogContent>
-                        <DialogContentText id="delete-dialog-description">
+                        <DialogContentText id='delete-dialog-description'>
                             この「できたこと」の記録を本当に削除しますか？この操作は元に戻せません。
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleCloseDialog} color="primary">キャンセル</Button>
-                        <Button onClick={handleConfirmDelete} color="error" autoFocus>削除する</Button>
+                        <Button onClick={handleCloseDialog} color='primary'>キャンセル</Button>
+                        <Button onClick={handleConfirmDelete} color='error' autoFocus>削除する</Button>
                     </DialogActions>
                 </Dialog>
 

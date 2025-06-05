@@ -37,3 +37,14 @@ export const calculateAgeAtEvent = (birthDateString: string, eventDateString: st
         return null
     }
 }
+
+/**
+ * Ageオブジェクトを人間が読みやすい形式の文字列に変換します。
+ * @param age 月齢オブジェクト (Age | null)
+ * @returns {string} フォーマットされた月齢文字列、または「月齢未計算」
+ */
+
+export const formatAge = (age: Age | null): string => {
+    if (!age) return '月齢未計算'
+    return `${age.years}歳${age.months}ヶ月${age.days}日`
+}
