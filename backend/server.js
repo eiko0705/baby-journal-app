@@ -66,7 +66,7 @@ app.get('/api/achievements', async (req, res) => {
           days: achievement.age_days,
         } : null,
         tags: achievement.tags || [],
-        photoUrl: achievement.photo_url,
+        photo: achievement.photo_url,
         createdAt: achievement.created_at,
         updatedAt: achievement.updated_at,
       }
@@ -111,7 +111,23 @@ app.post('/api/achievements', async (req, res) => {
     ];
 
     const result = await pool.query(queryText, values);
-    res.status(201).json(result.rows[0]);
+    const achievement = result.rows[0];
+    const formattedAchievement = {
+      id: achievement.id,
+      date: achievement.date,
+      title: achievement.title,
+      description: achievement.description,
+      ageAtEvent: (achievement.age_years !== null && achievement.age_months !== null && achievement.age_days !== null) ? {
+        years: achievement.age_years,
+        months: achievement.age_months,
+        days: achievement.age_days,
+      } : null,
+      tags: achievement.tags || [],
+      photo: achievement.photo_url,
+      createdAt: achievement.created_at,
+      updatedAt: achievement.updated_at,
+    };
+    res.status(201).json(formattedAchievement);
   } catch (error) {
     console.error('Error creating achievement:', error);
     res.status(500).json({ error: 'Internal server error while creating achievement' });
@@ -189,7 +205,24 @@ app.put('/api/achievements/:id', async (req, res) => {
       return res.status(404).json({ error: 'Achievement not found' });
     }
 
-    res.status(200).json(result.rows[0]);
+    const achievement = result.rows[0];
+    const formattedAchievement = {
+      id: achievement.id,
+      date: achievement.date,
+      title: achievement.title,
+      description: achievement.description,
+      ageAtEvent: (achievement.age_years !== null && achievement.age_months !== null && achievement.age_days !== null) ? {
+        years: achievement.age_years,
+        months: achievement.age_months,
+        days: achievement.age_days,
+      } : null,
+      tags: achievement.tags || [],
+      photo: achievement.photo_url,
+      createdAt: achievement.created_at,
+      updatedAt: achievement.updated_at,
+    };
+
+    res.status(200).json(formattedAchievement);
   } catch (error) {
     console.error(`Error updating achievement with id ${id}:`, error);
     res.status(500).json({ error: 'Internal server error while updating achievement' });
