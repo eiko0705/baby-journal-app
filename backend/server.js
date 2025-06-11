@@ -228,6 +228,48 @@ app.put('/api/achievements/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error while updating achievement' });
   }
 });
+
+app.post('/api/achievements/:id/photo', upload.single('photo'), async (req, res) => {
+  const { id } = req.params;
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+  const photoUrl = req.file.location;
+  try {
+    const queryText = `
+      UPDATE achievements
+      SET photo_url = $1,
+      updated_at = CURRENT_TIMESTAMP
+      WHERE id = $2
+      RETURNING *;
+    `;
+    const values = [photoUrl, id];
+    const result = await pool.query(queryText, values);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Achievement not found' });
+    }
+    const achievement = result.rows[0];
+    const formattedAchievement = {
+      id: achievement.id,
+      date: achievement.date,
+      title: achievement.title,
+      description: achievement.description,
+      ageAtEvent: (achievement.age_years !== null && achievement.age_months !== null && achievement.age_days !== null) ? {
+        years: achievement.age_years,
+        months: achievement.age_months,
+        days: achievement.age_days,
+      } : null,
+      tags: achievement.tags || [],
+      photo: achievement.photo_url,
+      createdAt: achievement.created_at,
+      updatedAt: achievement.updated_at,
+    };
+    res.status(200).json(formattedAchievement);
+  } catch (error) {
+    console.error(`Error updating photo for achievement with id ${id}:`, error);
+    res.status(500).json({ error: 'Internal server error while updating photo' });
+  }
+});
   
 app.listen(port, () => {
   console.log(`Backend server is listening on port ${port}`);
