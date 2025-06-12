@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { TextField, Button, Box, Typography, Grid, CircularProgress } from '@mui/material'
 import type { AppDispatch } from '../../../app/store'
-import { addNewAchievement, selectAchievementsStatus } from '../achievementsSlice'
+import { addNewAchievement, selectAchievementsStatus, uploadPhoto } from '../achievementsSlice'
 import { selectBirthday } from '../../childProfile/childProfileSlice'
 import { calculateAgeAtEvent } from '../../../utils/dateUtils'
 import type { NewAchievementPayload, Age } from '../../../types'
@@ -16,6 +16,25 @@ const AddAchievementForm: React.FC = () => {
     const [title, setTitle] = useState<string>('')
     const [description, setDescription] = useState<string>('')
     const [tags, setTags] = useState<string>('')
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [preview, setPreview] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (!selectedFile) {
+            setPreview(null)
+            return
+        }
+        const objectUrl = URL.createObjectURL(selectedFile)
+        setPreview(objectUrl)
+
+        return () => URL.revokeObjectURL(objectUrl)
+    }, [selectedFile])
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            setSelectedFile(event.target.files[0])
+        }
+    }
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -42,18 +61,25 @@ const AddAchievementForm: React.FC = () => {
             description,
             ageAtEvent: calculatedAge,
             tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
-            // photo: null
         }
 
         try {
-            await dispatch(addNewAchievement(newAchievementPayload)).unwrap()
+            const addedAchievementAction = await dispatch(addNewAchievement(newAchievementPayload)).unwrap()
+            const newAchievementId = addedAchievementAction.id
+
+            if (selectedFile && newAchievementId) {
+                await dispatch(uploadPhoto({ id: newAchievementId, photoFile: selectedFile })).unwrap()
+            }
+
             setDate('')
             setTitle('')
             setDescription('')
             setTags('')
+            setSelectedFile(null)
+            setPreview(null)
         } catch (error: any) {
-            console.error('Failed to add achievement:', error)
-            alert(`記録に失敗しました。: ${error.message || '不明なエラーが発生しました。'}`)
+            console.error('Failed to add achievement or upload photo:', error)
+            alert(`保存または写真のアップロードに失敗しました: ${error.message || '不明なエラーが発生しました。'}`)
         }
     }
 
@@ -107,6 +133,34 @@ const AddAchievementForm: React.FC = () => {
                         disabled={addStatus === 'loading'}
                     />
                 </Grid>
+                <Grid item xs={12}>
+                    <Button
+                        variant="outlined"
+                        component="label"
+                        disabled={addStatus === 'loading'}
+                    >
+                        写真を選択
+                        <input
+                            type="file"
+                            hidden
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            id="photo-upload"
+                        />
+                    </Button>
+                    {selectedFile && (
+                        <Typography variant="body2" sx={{ ml: 2, display: 'inline-block' }}>
+                            {selectedFile.name}
+                        </Typography>
+                    )}
+                </Grid>
+
+                {preview && (
+                    <Grid item xs={12}>
+                        <Box component="img" src={preview} alt="Preview" sx={{ maxWidth: '100%', maxHeight: '200px', mt: 1 }} />
+                    </Grid>
+                )}
+                
                 <Grid xs={12}>
                     <Button
                         type="submit"

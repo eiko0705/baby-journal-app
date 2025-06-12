@@ -100,7 +100,7 @@
                 </Typography>
             )
         }
-        
+
         return (
             <Box sx={{ mt: 3 }}>
                 <Typography variant='h6' gutterBottom>
@@ -155,6 +155,21 @@
                                                             <Chip key={tag} label={tag} size='small' sx={{ mr: 0.5, mb: 0.5 }} />
                                                         ))}
                                                     </Box>
+                                                )}
+                                                {achievement.photo && (
+                                                    <Box
+                                                        component="img"
+                                                        src={achievement.photo}
+                                                        alt={achievement.title}
+                                                        sx={{
+                                                            height: 233,
+                                                            width: 350,
+                                                            maxWidth: { xs: 150, md: 200 },
+                                                            maxHeight: { xs: 250, md: 350 },
+                                                            mt: 2,
+                                                            borderRadius: '4px',
+                                                        }}
+                                                    />
                                                 )}
                                             </>
                                         }

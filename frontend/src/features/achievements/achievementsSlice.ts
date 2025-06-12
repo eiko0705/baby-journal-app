@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../../app/store'
 import type { Achievement, NewAchievementPayload } from '../../types'
-import { createAchievemntAPI, fetchAchievementsAPI, deleteAchievementAPI, updateAchievementAPI } from '../../services/achievementService'
+import { createAchievemntAPI, fetchAchievementsAPI, deleteAchievementAPI, updateAchievementAPI, uploadPhotoAPI } from '../../services/achievementService'
 
 interface AchievementsState {
     items: Achievement[]
@@ -44,6 +44,14 @@ export const updateAchievement = createAsyncThunk<Achievement, { id: string, ach
     'achievements/updateAchievement',
     async ({ id, achievementData }) => {
         const response = await updateAchievementAPI(id, achievementData)
+        return response
+    }
+)
+
+export const uploadPhoto = createAsyncThunk<Achievement, { id: string, photoFile: File }>(
+    'achievements/uploadPhoto',
+    async ({ id, photoFile }) => {
+        const response = await uploadPhotoAPI(id, photoFile)
         return response
     }
 )
@@ -102,6 +110,21 @@ export const achievementsSlice = createSlice({
             .addCase(updateAchievement.rejected, (state, action) => {
                 state.status = 'failed'
                 state.error = action.error.message || 'Failed to update achievement'
+            })
+            .addCase(uploadPhoto.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(uploadPhoto.fulfilled, (state, action: PayloadAction<Achievement>) => {
+                state.status = 'succeeded'
+                const updatedAchievement = action.payload
+                const index = state.items.findIndex(item => item.id === updatedAchievement.id)
+                if (index !== -1) {
+                    state.items[index] = updatedAchievement
+                }
+            })
+            .addCase(uploadPhoto.rejected, (state, action) => {
+                state.status = 'failed'
+                state.error = action.error.message || 'Failed to upload photo'
             })
         }
 })

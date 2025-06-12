@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import { Pool } from 'pg';
 import { nanoid } from 'nanoid';
+import upload from './s3-upload.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
