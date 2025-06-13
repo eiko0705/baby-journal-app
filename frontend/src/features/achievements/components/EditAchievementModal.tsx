@@ -69,17 +69,17 @@ const EditAchievementModal: React.FC<EditAchievementModalProps> = ({ open, onClo
     if (!achievement) return
 
     if (!childBirthday) {
-      alert('子供の誕生日を設定してください。')
+      alert('Please set the child\'s birthday.')
       return
     }
 
     if (!formDate || !formTitle) {
-      alert('日付とタイトルは必須です。')
+      alert('Date and title are required.')
       return
     }
 
     if (!calculatedAge) {
-      alert('月齢が計算できませんでした。日付を確認してください。')
+      alert('Age cannot be calculated. Please check the date.')
       return
     }
 
@@ -98,12 +98,12 @@ const EditAchievementModal: React.FC<EditAchievementModalProps> = ({ open, onClo
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
-      <DialogTitle>「できたこと」を編集</DialogTitle>
+      <DialogTitle>Edit Achievement</DialogTitle>
       <DialogContent>
         <Box component='form' noValidate sx={{ mt: 1}}>
           <Grid item xs={12} sm={6}>
             <TextField
-              label='日付'
+              label='Date'
               type='date'
               value={formDate}
               onChange={(e) => handleDateChange(e.target.value)}
@@ -118,7 +118,7 @@ const EditAchievementModal: React.FC<EditAchievementModalProps> = ({ open, onClo
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
-              label='タイトル'
+              label='Title'
               value={formTitle}
               onChange={(e) => setFormTitle(e.target.value)}
               required
@@ -137,12 +137,12 @@ const EditAchievementModal: React.FC<EditAchievementModalProps> = ({ open, onClo
                 mb: 1
               }}
             >
-              月齢：{calculatedAge ? formatAge(calculatedAge) : '日付を入力してください'}
+              Age: {calculatedAge ? formatAge(calculatedAge) : 'Please enter the date.'}
             </Typography>
           </Grid>
           <Grid item xs={12}>
               <TextField
-                label="詳細"
+                label="Description"
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
                 multiline
@@ -153,19 +153,30 @@ const EditAchievementModal: React.FC<EditAchievementModalProps> = ({ open, onClo
           </Grid>
           <Grid item xs={12}>
             <TextField
-              label='タグ (カンマ区切りで入力)'
+              label='Tags (comma separated)'
               value={formTags}
               onChange={(e) => setFormTags(e.target.value)}
               fullWidth
-              helperText='例: #初めてのハイハイ, #お気に入りのおもちゃ'
+              helperText='Example: #first time, #favorite toy'
               disabled={achievementApiStatus === 'loading'}
             />
           </Grid>
         </Box>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} disabled={achievementApiStatus === 'loading'}>
-          キャンセル
+        <Button 
+          onClick={onClose} 
+          disabled={achievementApiStatus === 'loading'}
+          sx={{
+            borderColor: '#A2E4B8',
+            color: '#A2E4B8',
+            '&:hover': {
+              backgroundColor: 'rgba(162, 228, 184, 0.1)',
+              borderColor: '#8BD4A0',
+            }
+          }}
+        >
+          Cancel
         </Button>
         <Button
           onClick={handleSubmit}
@@ -173,7 +184,7 @@ const EditAchievementModal: React.FC<EditAchievementModalProps> = ({ open, onClo
           color='primary'
           disabled={achievementApiStatus === 'loading'}
         >
-          {achievementApiStatus === 'loading' ? <CircularProgress size={24}/> : '保存する'}
+          {achievementApiStatus === 'loading' ? <CircularProgress size={24}/> : 'Save'}
         </Button>
       </DialogActions>
     </Dialog>

@@ -40,18 +40,18 @@ const AddAchievementForm: React.FC = () => {
         event.preventDefault()
 
         if (!childBirthday) {
-            alert('お子様の誕生日が設定されていません。先に誕生日を設定してください。')
+            alert('The child\'s birthday is not set. Please set the birthday first.')
             return
         }
 
         if (!date || !title ) {
-            alert('日付とタイトルは必須です。')
+            alert('Date and title are required.')
             return
         }
 
         const calculatedAge: Age | null = calculateAgeAtEvent(childBirthday, date)
         if (!calculatedAge) {
-            alert('日付の形式が正しくないか、イベント日が誕生日より前です。修正してください。')
+            alert('The date format is incorrect or the event date is before the birthday. Please correct it.')
             return
         }
 
@@ -79,7 +79,7 @@ const AddAchievementForm: React.FC = () => {
             setPreview(null)
         } catch (error: any) {
             console.error('Failed to add achievement or upload photo:', error)
-            alert(`保存または写真のアップロードに失敗しました: ${error.message || '不明なエラーが発生しました。'}`)
+            alert(`Failed to add achievement or upload photo: ${error.message || 'An unknown error occurred.'}`)
         }
     }
 
@@ -87,12 +87,18 @@ const AddAchievementForm: React.FC = () => {
         <Box
             component="form"
             onSubmit={handleSubmit}
-            sx={{ mt: 2, p: 2, border: '1px solid lightgray', borderRadius: '8px' }}>
+            sx={{ 
+                mt: 2, 
+                p: 2, 
+                border: '1px solid #C8F0D4', 
+                borderRadius: '8px',
+                backgroundColor: '#F8F8F8'
+            }}>
             <Typography variant="h6" gutterBottom>Add Achievement</Typography>
             <Grid container spacing={2}>
                 <Grid xs={12} md={6}>
                     <TextField
-                        label="日付"
+                        label="Date"
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
@@ -104,7 +110,7 @@ const AddAchievementForm: React.FC = () => {
                 </Grid>
                 <Grid xs={12} md={6}>
                     <TextField
-                        label="タイトル"
+                        label="Title"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         fullWidth
@@ -114,7 +120,7 @@ const AddAchievementForm: React.FC = () => {
                 </Grid>
                 <Grid xs={12}>
                     <TextField
-                        label="詳細"
+                        label="Description"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         multiline
@@ -125,11 +131,11 @@ const AddAchievementForm: React.FC = () => {
                 </Grid>
                 <Grid xs={12}>
                     <TextField
-                        label="タグ（カンマ区切りで入力）"
+                        label="Tags (comma separated)"
                         value={tags}
                         onChange={(e) => setTags(e.target.value)}
                         fullWidth
-                        helperText="例：　#初めてのハイハイ, #お気に入りのおもちゃ"
+                        helperText="Example: #first time, #favorite toy"
                         disabled={addStatus === 'loading'}
                     />
                 </Grid>
@@ -138,8 +144,16 @@ const AddAchievementForm: React.FC = () => {
                         variant="outlined"
                         component="label"
                         disabled={addStatus === 'loading'}
+                        sx={{
+                            borderColor: '#A2E4B8',
+                            color: '#A2E4B8',
+                            '&:hover': {
+                                backgroundColor: 'rgba(162, 228, 184, 0.1)',
+                                borderColor: '#8BD4A0',
+                            }
+                        }}
                     >
-                        写真を選択
+                        Select Photo
                         <input
                             type="file"
                             hidden
@@ -165,10 +179,16 @@ const AddAchievementForm: React.FC = () => {
                     <Button
                         type="submit"
                         variant="contained"
-                        color="primary"
+                        sx={{
+                            backgroundColor: '#FFFFE0',
+                            color: '#4A4A4A',
+                            '&:hover': {
+                                backgroundColor: '#FFFACD',
+                            }
+                        }}
                         disabled={addStatus === 'loading'}
                     >
-                        {addStatus === 'loading' ? <CircularProgress size={24} /> : '記録する'}
+                        {addStatus === 'loading' ? <CircularProgress size={24} /> : 'Add'}
                     </Button>
                 </Grid>
             </Grid>

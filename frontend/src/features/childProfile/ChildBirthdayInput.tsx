@@ -26,8 +26,16 @@ const ChildBirthdayInput: React.FC = () => {
     }
 
     return (
-        <Box sx={{ my: 2, p: 2, border: '1px solid grey', borderRadius: '4px' }}>
-            <Typography variant="h6" gutterBottom>Child's Birthday</Typography>
+        <Box sx={{ 
+            my: 2, 
+            p: 2, 
+            border: '1px solid #C8F0D4', 
+            borderRadius: '8px',
+            backgroundColor: '#F8F8F8'
+        }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#4A4A4A', fontWeight: 600 }}>
+                Child's Birthday
+            </Typography>
             <TextField
                 label="Birthday (YYYY-MM-DD)"
                 type="date"
@@ -39,7 +47,17 @@ const ChildBirthdayInput: React.FC = () => {
                 fullWidth
                 sx={{ mb: 2 }}
             />
-            <Button variant="contained" onClick={handleSaveBirthday}>
+            <Button 
+                variant="contained" 
+                onClick={handleSaveBirthday}
+                sx={{
+                    backgroundColor: '#FFFFE0',
+                    color: '#4A4A4A',
+                    '&:hover': {
+                        backgroundColor: '#FFFACD',
+                    }
+                }}
+            >
                 Save Birthday
             </Button>
         </Box>

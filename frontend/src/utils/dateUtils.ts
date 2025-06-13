@@ -45,6 +45,6 @@ export const calculateAgeAtEvent = (birthDateString: string, eventDateString: st
  */
 
 export const formatAge = (age: Age | null): string => {
-    if (!age) return '月齢未計算'
-    return `${age.years}歳${age.months}ヶ月${age.days}日`
+    if (!age) return 'Age not calculated'
+    return `${age.years}years ${age.months}months ${age.days}days`
 }
