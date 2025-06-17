@@ -29,9 +29,10 @@ const ChildBirthdayInput: React.FC = () => {
         <Box sx={{ 
             my: 2, 
             p: 2, 
-            border: '1px solid #C8F0D4', 
+            border: '1px solid',
+            borderColor: 'divider',
             borderRadius: '8px',
-            backgroundColor: '#F8F8F8'
+            backgroundColor: 'background.paper'
         }}>
             <Typography variant="h6" gutterBottom sx={{ color: '#4A4A4A', fontWeight: 600 }}>
                 Child's Birthday
@@ -51,11 +52,8 @@ const ChildBirthdayInput: React.FC = () => {
                 variant="contained" 
                 onClick={handleSaveBirthday}
                 sx={{
-                    backgroundColor: '#FFFFE0',
-                    color: '#4A4A4A',
-                    '&:hover': {
-                        backgroundColor: '#FFFACD',
-                    }
+                    backgroundColor: 'primary.main',
+                    color: 'text.primary',
                 }}
             >
                 Save Birthday

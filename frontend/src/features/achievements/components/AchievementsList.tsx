@@ -103,15 +103,16 @@
 
         return (
             <Box sx={{ mt: 3 }}>
-                <Typography variant='h6' gutterBottom sx={{ color: '#4A4A4A', fontWeight: 600 }}>
+                <Typography variant='h6' gutterBottom sx={{ color: 'text.primary', fontWeight: 600 }}>
                     Achievement List
                 </Typography>
                 {status === 'loading' && <CircularProgress size={20} sx={{ display: 'block', margin: '0 auto' }} />}
                 <Paper 
                     elevation={2}
                     sx={{
-                        backgroundColor: '#F8F8F8',
-                        border: '1px solid #C8F0D4',
+                        backgroundColor: 'background.paper',
+                        border: '1px solid',
+                        borderColor: 'divider',
                         boxShadow: '0 2px 4px rgba(162, 228, 184, 0.1)'
                     }}
                 >

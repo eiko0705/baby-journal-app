@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Typography, Box, AppBar, Toolbar } from '@mui/material'
+import { Container, Typography, Box, AppBar, Toolbar, Paper } from '@mui/material'
 import './App.css'
 import ChildBirthdayInput from './features/childProfile/ChildBirthdayInput'
 import AddAchievementForm from './features/achievements/components/AddAchievementForm'
@@ -11,9 +11,9 @@ function App() {
     <>
       <AppBar 
         position="static"
+        color='primary'
         sx={{
-          backgroundColor: '#A2E4B8',
-          color: '#4A4A4A',
+          color: 'contrastText',
           boxShadow: '0 2px 4px rgba(162, 228, 184, 0.2)'
         }}
       >
@@ -24,7 +24,6 @@ function App() {
             sx={{ 
               flexGrow: 1,
               fontWeight: 600,
-              color: '#4A4A4A'
             }}
           >
             Mameko App
@@ -35,15 +34,21 @@ function App() {
       <Container 
         maxWidth="md"
         sx={{
-          backgroundColor: '#F8F8F8',
+          backgroundColor: 'default',
           minHeight: '100vh',
           py: 3
         }}
       >
         <Box sx={{ my: 4 }}>
-          <ChildBirthdayInput />
-          <AddAchievementForm />
-          <AchievementsList />
+          <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+            <ChildBirthdayInput />
+          </Paper>
+          <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+            <AddAchievementForm />
+          </Paper>
+          <Paper elevation={2} sx={{ p: 3 }}>
+            <AchievementsList />
+          </Paper>
         </Box>
       </Container>
     </>

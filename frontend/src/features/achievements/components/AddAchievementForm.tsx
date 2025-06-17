@@ -90,12 +90,22 @@ const AddAchievementForm: React.FC = () => {
             sx={{ 
                 mt: 2, 
                 p: 2, 
-                border: '1px solid #C8F0D4', 
+                border: '1px solid',
+                borderColor: 'divider',
                 borderRadius: '8px',
-                backgroundColor: '#F8F8F8'
+                backgroundColor: 'background.paper'
             }}>
             <Typography variant="h6" gutterBottom>Add Achievement</Typography>
-            <Grid container spacing={2}>
+            <Grid 
+                container 
+                spacing={2} 
+                sx={{ 
+                    width: '100%', 
+                    margin: 0,
+                    padding: 0,
+                    boxSizing: 'border-box'
+                }}
+            >
                 <Grid xs={12} md={6}>
                     <TextField
                         label="Date"
@@ -141,16 +151,13 @@ const AddAchievementForm: React.FC = () => {
                 </Grid>
                 <Grid item xs={12}>
                     <Button
-                        variant="outlined"
+                        variant="contained"
+                        color="secondary"
                         component="label"
                         disabled={addStatus === 'loading'}
                         sx={{
-                            borderColor: '#A2E4B8',
-                            color: '#A2E4B8',
-                            '&:hover': {
-                                backgroundColor: 'rgba(162, 228, 184, 0.1)',
-                                borderColor: '#8BD4A0',
-                            }
+                            backgroundColor: 'secondary.main',
+                            color: 'primary.contrastText',
                         }}
                     >
                         Select Photo
@@ -179,12 +186,9 @@ const AddAchievementForm: React.FC = () => {
                     <Button
                         type="submit"
                         variant="contained"
+                        color="primary"
                         sx={{
-                            backgroundColor: '#FFFFE0',
-                            color: '#4A4A4A',
-                            '&:hover': {
-                                backgroundColor: '#FFFACD',
-                            }
+                            color: 'text.primary',
                         }}
                         disabled={addStatus === 'loading'}
                     >
