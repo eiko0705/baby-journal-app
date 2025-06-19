@@ -3,6 +3,7 @@
     import { Box, Typography, List, ListItem, ListItemText, Chip, Divider, Paper, CircularProgress, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material'
     import DeleteIcon from '@mui/icons-material/Delete'
     import EditIcon from '@mui/icons-material/Edit'
+    import { format, parseISO } from 'date-fns'
     import {
         fetchAchievements,
         deleteAchievement,
@@ -11,7 +12,7 @@
         selectAchievementsStatus,
         selectAchievementsError
     } from '../achievementsSlice'
-    import type { Achievement, Age, NewAchievementPayload } from '../../../types'
+    import type { Achievement, NewAchievementPayload } from '../../../types'
     import type { AppDispatch } from '../../../app/store'
     import EditAchievementModal from './EditAchievementModal'
     import { formatAge } from '../../../utils/dateUtils'
@@ -164,8 +165,8 @@
                                         secondary={
                                             <>
                                                 <Typography component='span' variant='body2' color='text.primary' display='block' sx={{ color: '#4A4A4A' }}>
-                                                    Date: {achievement.date}（Age: {formatAge(achievement.ageAtEvent)}）
-                                                </Typography> 
+                                                    Date: {format(parseISO(achievement.date), 'yyyy-MM-dd')}（Age: {formatAge(achievement.ageAtEvent)}）
+                                                </Typography>
                                                 <Typography component='span' variant='body2' color='text.secondary' display='block' sx={{ whiteSpace: 'pre-wrap', mt: 0.5, color: '#757575' }}>
                                                     {achievement.description}
                                                 </Typography>
