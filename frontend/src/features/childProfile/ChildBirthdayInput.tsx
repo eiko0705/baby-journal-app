@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { TextField, Button, Box, Typography } from "@mui/material"
-import type { AppDispatch, RootState } from "../../app/store"
+import type { AppDispatch } from "../../app/store"
 import { setBirthday, selectBirthday } from "./childProfileSlice"
 
 const ChildBirthdayInput: React.FC = () => {

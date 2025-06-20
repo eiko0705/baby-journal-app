@@ -272,6 +272,63 @@ app.post('/api/achievements/:id/photo', upload.single('photo'), async (req, res)
   }
 });
   
+app.get('/api/profile', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM child_profile ORDER BY created_at DESC LIMIT 1');
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Profile not found' });
+    }
+    const profile = result.rows[0];
+    res.status(200).json({
+      id: profile.id,
+      nickname: profile.nickname,
+      gender: profile.gender,
+      birthday: profile.birthday,
+      createdAt: profile.created_at,
+      updatedAt: profile.updated_at,
+    });
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    res.status(500).json({ error: 'Internal server error while fetching profile' });
+  }
+});
+
+app.put('/api/profile', async (req, res) => {
+  const { nickname, gender, birthday } = req.body;
+  
+  if (!nickname || !gender || !birthday) {
+    return res.status(400).json({ error: 'Nickname, gender, and birthday are required' });
+  }
+  
+  try {
+    const queryText = `
+      INSERT INTO child_profile (id, nickname, gender, birthday)
+      VALUES (1, $1, $2, $3)
+      ON CONFLICT (id) DO UPDATE SET
+        nickname = EXCLUDED.nickname,
+        gender = EXCLUDED.gender,
+        birthday = EXCLUDED.birthday,
+        updated_at = CURRENT_TIMESTAMP
+      RETURNING *
+    `;
+    const values = [nickname, gender, birthday];
+    const result = await pool.query(queryText, values);
+    
+    const profile = result.rows[0];
+    res.status(200).json({
+      id: profile.id,
+      nickname: profile.nickname,
+      gender: profile.gender,
+      birthday: profile.birthday,
+      createdAt: profile.created_at,
+      updatedAt: profile.updated_at,
+    });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ error: 'Internal server error while updating profile' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Backend server is listening on port ${port}`);
 });
