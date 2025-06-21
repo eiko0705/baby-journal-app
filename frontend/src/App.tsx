@@ -1,7 +1,7 @@
 import React from 'react'
 import { Container, Typography, Box, AppBar, Toolbar, Paper } from '@mui/material'
 import './App.css'
-import ChildBirthdayInput from './features/childProfile/ChildBirthdayInput'
+import ChildProfileForm from './features/childProfile/ChildProfileForm'
 import AddAchievementForm from './features/achievements/components/AddAchievementForm'
 import AchievementsList from './features/achievements/components/AchievementsList'
 
@@ -41,7 +41,7 @@ function App() {
       >
         <Box sx={{ my: 4 }}>
           <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-            <ChildBirthdayInput />
+            <ChildProfileForm />
           </Paper>
           <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
             <AddAchievementForm />

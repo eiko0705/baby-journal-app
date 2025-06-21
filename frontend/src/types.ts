@@ -16,4 +16,13 @@ export interface Achievement {
 
 export type NewAchievementPayload = Omit<Achievement, 'id'>
 
+export interface ChildProfile {
+    id: string
+    nickname: string
+    gender: string
+    birthday: string
+    createdAt: string
+    updatedAt: string
+}
+
 
