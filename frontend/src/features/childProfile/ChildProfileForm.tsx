@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { TextField, Button, Box, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress } from "@mui/material"
+import { format, parseISO, isValid } from 'date-fns'
 import type { AppDispatch } from "../../app/store"
 import { fetchProfile, updateProfile, selectProfile, selectProfileStatus, selectProfileError } from "./childProfileSlice"
 
@@ -23,6 +24,21 @@ const ChildProfileForm: React.FC = () => {
             setLocalNickname(profile.nickname || "")
             setLocalGender(profile.gender || "")
             setLocalBirthday(profile.birthday || "")
+            
+            if (profile.birthday) {
+                try {
+                    const parsedDate = parseISO(profile.birthday)
+                    if (isValid(parsedDate)) {
+                        setLocalBirthday(format(parsedDate, 'yyyy-MM-dd'))
+                    } else {
+                        setLocalBirthday('')
+                    }
+                } catch (_) {
+                    setLocalBirthday('')
+                }
+            } else {
+                setLocalBirthday('')
+            }
         }
     }, [profile])
 
@@ -60,11 +76,11 @@ const ChildProfileForm: React.FC = () => {
                 Child Profile
             </Typography>
             
-            {error && (
+            {/* {error && (
                 <Typography color="error" sx={{ mb: 2 }}>
                     Error: {error}
                 </Typography>
-            )}
+            )} */}
 
             <TextField
                 label="Nickname"
