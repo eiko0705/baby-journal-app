@@ -3,16 +3,27 @@ import express from 'express';
 import { Pool } from 'pg';
 import { nanoid } from 'nanoid';
 import upload from './s3-upload.js';
+import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Pool for PostgreSQL
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_DATABASE,
   password: process.env.DB_PASSWORD,
   port: parseInt(process.env.DB_PORT || '5432', 10),
+});
+
+// S3 client for AWS S3
+const s3 = new S3Client({
+  region: process.env.AWS_S3_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 });
 
 app.use(express.json());
@@ -326,6 +337,50 @@ app.put('/api/profile', async (req, res) => {
   } catch (error) {
     console.error('Error updating profile:', error);
     res.status(500).json({ error: 'Internal server error while updating profile' });
+  }
+});
+
+// Delete /api/achievements/:id/photo
+app.delete('/api/achievements/:id/photo', async (req, res) => {
+  const { id } = req.params; 
+  try {
+    const selectResult = await pool.query('SELECT photo_url FROM achievements WHERE id = $1', [id]);
+    if (selectResult.rowCount === 0) {
+      return res.status(404).json({ error: 'Achievement not found' });
+    }
+    const photoUrl = selectResult.rows[0].photo_url;
+
+    if (!photoUrl) {
+      return res.status(404).json({ error: 'Photo not found' });
+    }
+    const url = new URL(photoUrl);
+    const key = url.pathname.substring(1);
+    const deleteParams = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: key,
+    };
+    await s3.send(new DeleteObjectCommand(deleteParams));
+
+    const updateQueryText = `UPDATE achievements SET photo_url = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *`;
+
+    const updateResult = await pool.query(updateQueryText, [id]);
+
+    const achievement = updateResult.rows[0];
+    const formattedAchievement = {
+      id: achievement.id,
+      date: achievement.date,
+      title: achievement.title,
+      description: achievement.description,
+      ageAtEvent: (achievement.age_years !== null) ? { years: achievement.age_years, months: achievement.age_months, days: achievement.age_days } : null,
+      tags: achievement.tags || [],
+      photo: null,
+      createdAt: achievement.created_at,
+      updatedAt: achievement.updated_at,
+    };
+    res.status(200).json(formattedAchievement);
+  } catch (error) {
+    console.error(`Error deleting photo for achievement with id ${id}:`, error);
+    res.status(500).json({ error: 'Internal server error while deleting photo' });
   }
 });
 

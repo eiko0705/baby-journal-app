@@ -10,7 +10,7 @@ function App() {
   return (
     <>
       <AppBar 
-        position="static"
+        position="fixed"
         color='primary'
         sx={{
           color: 'contrastText',
